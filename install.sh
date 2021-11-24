@@ -19,7 +19,6 @@ print_modname() {
 }
 
 on_install() {
-	SQLITE3="$MODPATH/sqlite/$ARCH32/sqlite3"
 	DIALER_PACKAGE="com.google.android.dialer"
 	DIALER_USER=$(stat -c '%U' "/data/data/$DIALER_PACKAGE/files/")
 	PHENOTYPE_PATH="/data/data/com.google.android.gms/databases/phenotype.db"
@@ -52,8 +51,12 @@ on_install() {
 	}
 	
 	ui_print " - Checking your CPU architecture"
-	if [ "$ARCH32" != "arm" ] && [ "$ARCH32" != "x86" ]; then
-		ui_print " - Error > Unknown CPU architecture"
+	if [ "$ARCH" = "arm" ] || [ "$ARCH" = "arm64" ]; then
+		DEVICE_ARCH=arm
+	elif [ "$ARCH" = "x86" ] || [ "$ARCH" = "x64" ]; then
+		DEVICE_ARCH="x86"
+	else
+		ui_print " - Error > Unknown CPU architecture $ARCH"
 		ui_print " - Exiting..."
 		abort
 	fi
@@ -66,7 +69,8 @@ on_install() {
 	fi
 	
 	ui_print " - Extracting files"
-	unzip -o "$ZIPFILE" "sqlite/$ARCH32/sqlite3" -d "$MODPATH" >&2
+	unzip -o "$ZIPFILE" "sqlite/$DEVICE_ARCH/sqlite3" -d "$MODPATH" >&2
+	SQLITE3="$MODPATH/sqlite/$DEVICE_ARCH/sqlite3"
 	unzip -o "$ZIPFILE" "to-tmpdir/*" -d "$TMPDIR" >&2
 	mv "$TMPDIR"/to-tmpdir/* "$TMPDIR"
 	rm -rf "$TMPDIR/to-tmpdir"
