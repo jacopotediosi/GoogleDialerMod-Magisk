@@ -21,9 +21,10 @@ print_modname() {
 on_install() {
 	DIALER_PACKAGE="com.google.android.dialer"
 	DIALER_USER=$(stat -c '%U' "/data/data/$DIALER_PACKAGE/files/")
+	DIALER_DATA_PATH="/data/data/$DIALER_PACKAGE"
 	PHENOTYPE_PATH="/data/data/com.google.android.gms/databases/phenotype.db"
-	PHENOTYPE_CACHE="/data/data/$DIALER_PACKAGE/files/phenotype"
-	CALLRECORDINGPROMPT="/data/data/$DIALER_PACKAGE/files/callrecordingprompt"
+	PHENOTYPE_CACHE="$DIALER_DATA_PATH/files/phenotype"
+	CALLRECORDINGPROMPT="$DIALER_DATA_PATH/files/callrecordingprompt"
 	
 	ENABLE_CALL_RECORDING_FLAGS="G__enable_call_recording \
 	CallRecording__enable_call_recording_for_fi \
@@ -62,8 +63,15 @@ on_install() {
 	fi
 	
 	ui_print " - Checking the Phenotype DB existence"
-	if [ ! -e "$PHENOTYPE_PATH" ]; then
-		ui_print " - Error > Phenotype Database not found"
+	if [ ! -f "$PHENOTYPE_PATH" ]; then
+		ui_print " - Error > Phenotype DB not found"
+		ui_print " - Exiting..."
+		abort
+	fi
+	
+	ui_print " - Checking access to the Dialer data folder"
+	if [ ! -d "$DIALER_DATA_PATH" ]; then
+		ui_print " - Error > Cannot find the $DIALER_DATA_PATH path"
 		ui_print " - Exiting..."
 		abort
 	fi
