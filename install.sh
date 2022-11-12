@@ -118,8 +118,7 @@ on_install() {
 		mkdir "$CALLRECORDINGPROMPT"
 		cp "$TMPDIR/silent_wav.wav" "$CALLRECORDINGPROMPT/starting_voice-en_US.wav"
 		cp "$TMPDIR/silent_wav.wav" "$CALLRECORDINGPROMPT/ending_voice-en_US.wav"
-		chown -R "$DIALER_USER:$DIALER_USER" "$CALLRECORDINGPROMPT"
-		chmod -R 777 "$CALLRECORDINGPROMPT"
+		set_perm_recursive "$CALLRECORDINGPROMPT" "$DIALER_USER" "$DIALER_USER" 0755 0444
 		restorecon -R "$CALLRECORDINGPROMPT"
 	else
 		ui_print " - You chose NO"
